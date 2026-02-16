@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مشروع الميزان الذكي</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #22c55e;
+      --accent-2: #38bdf8;
+      --danger: #ef4444;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Cairo", "Segoe UI", Tahoma, sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0%, var(--bg) 45%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: min(980px, 100%);
+      background: linear-gradient(150deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(6px);
+    }
+
+    header {
+      padding: 30px 24px 20px;
+      background: linear-gradient(120deg, rgba(56, 189, 248, 0.15), rgba(34, 197, 94, 0.15));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 24px;
+    }
+
+    @media (min-width: 860px) {
+      main { grid-template-columns: 330px 1fr; }
+    }
+
+    .card {
+      background: rgba(17, 24, 39, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .label {
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+
+    .weight {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    #currentWeight {
+      font-size: clamp(2.2rem, 8vw, 3rem);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .unit {
+      font-size: 1.1rem;
+      color: var(--muted);
+      padding-bottom: 6px;
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 0.92rem;
+      color: var(--muted);
+      min-height: 1.4rem;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 14px;
+      margin-top: 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #06161a;
+      background: linear-gradient(90deg, var(--accent), #86efac);
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    button:hover { transform: translateY(-2px); filter: brightness(1.04); }
+    button:active { transform: translateY(0); }
+
+    canvas {
+      width: 100%;
+      height: 290px;
+      display: block;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.06), rgba(255, 255, 255, 0.01));
+    }
+
+    .chart-title {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+    }
+
+    .hint {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📟 نظام عرض مشروع الميزان الذكي</h1>
+      <p class="subtitle">واجهة تفاعلية لمتابعة الوزن الحالي وتاريخ القياسات مع الاتصال بلوحة ESP32.</p>
+    </header>
+
+    <main>
+      <section class="card">
+        <div class="label">الوزن الحالي</div>
+        <div class="weight">
+          <div id="currentWeight">--</div>
+          <div class="unit">كجم</div>
+        </div>
+        <div class="status" id="connectionStatus">غير متصل</div>
+        <button id="connectBtn">الاتصال بـ ESP32</button>
+        <div class="hint">* عند عدم توفر جهاز فعلي، يتم عرض بيانات تجريبية تلقائيًا.</div>
+      </section>
+
+      <section class="card">
+        <h2 class="chart-title">رسم بياني لتغيرات الوزن</h2>
+        <canvas id="weightChart" width="620" height="290"></canvas>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const connectBtn = document.getElementById("connectBtn");
+    const connectionStatus = document.getElementById("connectionStatus");
+    const currentWeightEl = document.getElementById("currentWeight");
+    const canvas = document.getElementById("weightChart");
+    const ctx = canvas.getContext("2d");
+
+    const maxPoints = 20;
+    const history = [];
+
+    function drawChart() {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Grid
+      ctx.strokeStyle = "rgba(229,231,235,0.14)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = (h - 30) * (i / 5) + 10;
+        ctx.beginPath();
+        ctx.moveTo(40, y);
+        ctx.lineTo(w - 16, y);
+        ctx.stroke();
+      }
+
+      if (history.length < 2) {
+        ctx.fillStyle = "rgba(229,231,235,0.7)";
+        ctx.font = "15px Cairo, sans-serif";
+        ctx.fillText("بانتظار البيانات...", 42, h / 2);
+        return;
+      }
+
+      const values = history.map(item => item.weight);
+      const min = Math.min(...values) - 0.4;
+      const max = Math.max(...values) + 0.4;
+      const range = max - min || 1;
+
+      const points = history.map((item, index) => {
+        const x = 40 + index * ((w - 60) / (maxPoints - 1));
+        const y = 10 + ((max - item.weight) / range) * (h - 40);
+        return { x, y, value: item.weight };
+      });
+
+      // Area fill
+      const gradient = ctx.createLinearGradient(0, 10, 0, h);
+      gradient.addColorStop(0, "rgba(34,197,94,0.35)");
+      gradient.addColorStop(1, "rgba(34,197,94,0.02)");
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, h - 20);
+      points.forEach(p => ctx.lineTo(p.x, p.y));
+      ctx.lineTo(points[points.length - 1].x, h - 20);
+      ctx.closePath();
+      ctx.fill();
+
+      // Line
+      ctx.strokeStyle = "#22c55e";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+      ctx.stroke();
+
+      // Points
+      points.forEach(p => {
+        ctx.fillStyle = "#38bdf8";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3.6, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Labels
+      ctx.fillStyle = "rgba(229,231,235,0.8)";
+      ctx.font = "12px Cairo, sans-serif";
+      ctx.fillText(max.toFixed(1) + " كجم", 4, 18);
+      ctx.fillText(min.toFixed(1) + " كجم", 4, h - 20);
+    }
+
+    function pushWeight(value) {
+      history.push({ weight: value, time: Date.now() });
+      if (history.length > maxPoints) history.shift();
+      currentWeightEl.textContent = value.toFixed(2);
+      drawChart();
+    }
+
+    // Simulated data in case ESP32 isn't available
+    function startDemoStream() {
+      let base = 68 + Math.random() * 3;
+      setInterval(() => {
+        base += (Math.random() - 0.5) * 0.35;
+        pushWeight(Math.max(40, Math.min(150, base)));
+      }, 1500);
+    }
+
+    async function connectESP32() {
+      if (!("serial" in navigator)) {
+        connectionStatus.textContent = "Web Serial غير مدعوم، جاري استخدام البيانات التجريبية.";
+        connectionStatus.style.color = "#fbbf24";
+        startDemoStream();
+        connectBtn.disabled = true;
+        connectBtn.textContent = "وضع المحاكاة مفعل";
+        return;
+      }
+
+      try {
+        const port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 });
+        connectionStatus.textContent = "✅ تم الاتصال بـ ESP32";
+        connectionStatus.style.color = "#4ade80";
+        connectBtn.disabled = true;
+        connectBtn.textContent = "متصل";
+
+        const decoder = new TextDecoderStream();
+        port.readable.pipeTo(decoder.writable);
+        const reader = decoder.readable.getReader();
+        let buffer = "";
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += value;
+          const lines = buffer.split("\n");
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            const num = parseFloat(line.trim());
+            if (!Number.isNaN(num)) pushWeight(num);
+          }
+        }
+      } catch (err) {
+        connectionStatus.textContent = "فشل الاتصال، تم التبديل للوضع التجريبي.";
+        connectionStatus.style.color = "#f87171";
+        startDemoStream();
+      }
+    }
+
+    connectBtn.addEventListener("click", connectESP32);
+    drawChart();
+  </script>
+</body>
+</html>
