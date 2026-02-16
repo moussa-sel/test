@@ -6,7 +6,7 @@
   <title>مشروع الميزان الذكي</title>
   <style>
     :root {
-      --bg: #0f172a;
+      --bg: #0b1220;
       --panel: #111827;
       --card: #1f2937;
       --text: #e5e7eb;
@@ -14,7 +14,9 @@
       --accent: #22c55e;
       --accent-2: #38bdf8;
       --danger: #ef4444;
-      --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      --warning: #fbbf24;
+      --line: rgba(255, 255, 255, 0.1);
+      --shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
       --radius: 16px;
     }
 
@@ -23,19 +25,17 @@
     body {
       margin: 0;
       font-family: "Cairo", "Segoe UI", Tahoma, sans-serif;
-      background: radial-gradient(circle at top, #1e293b 0%, var(--bg) 45%);
+      background: radial-gradient(circle at top, #182338 0%, var(--bg) 45%);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      padding: 16px;
     }
 
     .container {
-      width: min(980px, 100%);
-      background: linear-gradient(150deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      border: 1px solid var(--line);
       border-radius: 24px;
       box-shadow: var(--shadow);
       overflow: hidden;
@@ -43,44 +43,50 @@
     }
 
     header {
-      padding: 30px 24px 20px;
+      padding: 22px 18px;
       background: linear-gradient(120deg, rgba(56, 189, 248, 0.15), rgba(34, 197, 94, 0.15));
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid var(--line);
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(1.3rem, 3vw, 2rem);
+      font-size: clamp(1.2rem, 5vw, 2rem);
       font-weight: 700;
     }
 
     .subtitle {
-      margin-top: 8px;
+      margin: 8px 0 0;
       color: var(--muted);
-      font-size: 0.98rem;
+      font-size: 0.95rem;
     }
 
     main {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 16px;
-      padding: 24px;
+      gap: 14px;
+      padding: 16px;
     }
 
-    @media (min-width: 860px) {
-      main { grid-template-columns: 330px 1fr; }
+    .grid-two {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 900px) {
+      .grid-two { grid-template-columns: 320px 1fr; }
     }
 
     .card {
-      background: rgba(17, 24, 39, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(17, 24, 39, 0.85);
+      border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 18px;
+      padding: 14px;
     }
 
     .label {
       color: var(--muted);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       font-size: 0.9rem;
     }
 
@@ -89,62 +95,143 @@
       align-items: flex-end;
       gap: 8px;
       margin-bottom: 8px;
+      flex-wrap: wrap;
     }
 
     #currentWeight {
-      font-size: clamp(2.2rem, 8vw, 3rem);
+      font-size: clamp(2rem, 10vw, 3rem);
       font-weight: 700;
       color: var(--accent);
       line-height: 1;
     }
 
     .unit {
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: var(--muted);
       padding-bottom: 6px;
     }
 
     .status {
-      margin-top: 14px;
+      margin-top: 10px;
       font-size: 0.92rem;
       color: var(--muted);
       min-height: 1.4rem;
     }
 
-    button {
-      width: 100%;
-      border: none;
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button,
+    input[type="number"] {
       border-radius: 12px;
-      padding: 13px 14px;
-      margin-top: 16px;
-      font-size: 1rem;
-      font-weight: 700;
+      border: 1px solid transparent;
+      padding: 11px 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    button {
       cursor: pointer;
-      color: #06161a;
+      font-weight: 700;
+      color: #07151b;
       background: linear-gradient(90deg, var(--accent), #86efac);
       transition: transform 0.2s ease, filter 0.2s ease;
     }
 
-    button:hover { transform: translateY(-2px); filter: brightness(1.04); }
+    button:hover { transform: translateY(-1px); filter: brightness(1.05); }
     button:active { transform: translateY(0); }
 
-    canvas {
-      width: 100%;
-      height: 290px;
-      display: block;
-      border-radius: 12px;
-      background: linear-gradient(180deg, rgba(56, 189, 248, 0.06), rgba(255, 255, 255, 0.01));
+    .btn-secondary {
+      color: #dbeafe;
+      background: linear-gradient(90deg, #2563eb, #38bdf8);
     }
 
-    .chart-title {
-      margin: 0 0 12px;
-      font-size: 1.05rem;
+    .btn-danger {
+      color: #fee2e2;
+      background: linear-gradient(90deg, #b91c1c, #ef4444);
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .input-row input {
+      background: rgba(255,255,255,0.03);
+      border-color: var(--line);
+      color: var(--text);
+      width: 100%;
+    }
+
+    @media (min-width: 560px) {
+      .input-row { grid-template-columns: 1fr auto; }
+      .input-row button { min-width: 140px; }
     }
 
     .hint {
       margin-top: 10px;
       color: var(--muted);
-      font-size: 0.85rem;
+      font-size: 0.82rem;
+    }
+
+    canvas {
+      width: 100%;
+      height: 280px;
+      display: block;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(56,189,248,0.08), rgba(255,255,255,0.01));
+    }
+
+    .chart-title {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      color: #cbd5e1;
+      background: rgba(255,255,255,0.02);
+    }
+
+    tbody tr:hover {
+      background: rgba(255,255,255,0.03);
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 16px;
+      text-align: center;
+    }
+
+    @media (max-width: 460px) {
+      main { padding: 12px; }
+      .card { padding: 12px; }
+      button, input[type="number"] { padding: 10px; }
     }
   </style>
 </head>
@@ -152,135 +239,233 @@
   <div class="container">
     <header>
       <h1>📟 نظام عرض مشروع الميزان الذكي</h1>
-      <p class="subtitle">واجهة تفاعلية لمتابعة الوزن الحالي وتاريخ القياسات مع الاتصال بلوحة ESP32.</p>
+      <p class="subtitle">عرض مباشر للوزن، تخزين القياسات بالتاريخ والوقت، ورسم بياني يتحدث تلقائيًا.</p>
     </header>
 
     <main>
-      <section class="card">
-        <div class="label">الوزن الحالي</div>
-        <div class="weight">
-          <div id="currentWeight">--</div>
-          <div class="unit">كجم</div>
-        </div>
-        <div class="status" id="connectionStatus">غير متصل</div>
-        <button id="connectBtn">الاتصال بـ ESP32</button>
-        <div class="hint">* عند عدم توفر جهاز فعلي، يتم عرض بيانات تجريبية تلقائيًا.</div>
-      </section>
+      <div class="grid-two">
+        <section class="card">
+          <div class="label">الوزن الحالي</div>
+          <div class="weight">
+            <div id="currentWeight">--</div>
+            <div class="unit">كجم</div>
+          </div>
+          <div class="status" id="connectionStatus">غير متصل</div>
+
+          <div class="actions">
+            <button id="connectBtn">الاتصال بـ ESP32</button>
+          </div>
+
+          <div class="input-row">
+            <input id="manualWeight" type="number" step="0.01" min="0" placeholder="أدخل وزنًا يدويًا (كجم)" />
+            <button id="addWeightBtn" class="btn-secondary">إضافة قياس</button>
+          </div>
+
+          <p class="hint">* عند عدم توفر ESP32 أو Web Serial سيتم استخدام المحاكاة. كل قياس يتم حفظه تلقائيًا في LocalStorage.</p>
+        </section>
+
+        <section class="card">
+          <h2 class="chart-title">رسم بياني لتغيرات الوزن</h2>
+          <canvas id="weightChart" width="720" height="280"></canvas>
+        </section>
+      </div>
 
       <section class="card">
-        <h2 class="chart-title">رسم بياني لتغيرات الوزن</h2>
-        <canvas id="weightChart" width="620" height="290"></canvas>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+          <h2 class="chart-title" style="margin:0;">سجل القياسات السابقة</h2>
+          <button id="clearBtn" class="btn-danger" style="width:auto;">حذف كل البيانات</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>الوزن (كجم)</th>
+                <th>التاريخ</th>
+                <th>الوقت</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
       </section>
     </main>
   </div>
 
   <script>
+    const STORAGE_KEY = "smartScaleMeasurements";
+    const MAX_POINTS = 30;
+
     const connectBtn = document.getElementById("connectBtn");
+    const addWeightBtn = document.getElementById("addWeightBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const manualWeightInput = document.getElementById("manualWeight");
     const connectionStatus = document.getElementById("connectionStatus");
     const currentWeightEl = document.getElementById("currentWeight");
+    const historyBody = document.getElementById("historyBody");
+
     const canvas = document.getElementById("weightChart");
     const ctx = canvas.getContext("2d");
 
-    const maxPoints = 20;
-    const history = [];
+    let measurements = loadMeasurements();
+    let demoTimer = null;
+
+    function loadMeasurements() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveMeasurements() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(measurements));
+    }
+
+    function formatDateTime(iso) {
+      const d = new Date(iso);
+      const date = d.toLocaleDateString("ar-EG");
+      const time = d.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      return { date, time };
+    }
+
+    function renderTable() {
+      historyBody.innerHTML = "";
+
+      if (!measurements.length) {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td colspan="4" class="empty">لا توجد قياسات محفوظة بعد.</td>`;
+        historyBody.appendChild(row);
+        return;
+      }
+
+      const list = [...measurements].reverse();
+      list.forEach((item, index) => {
+        const row = document.createElement("tr");
+        const dt = formatDateTime(item.time);
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${Number(item.weight).toFixed(2)}</td>
+          <td>${dt.date}</td>
+          <td>${dt.time}</td>
+        `;
+        historyBody.appendChild(row);
+      });
+    }
 
     function drawChart() {
       const w = canvas.width;
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      // Grid
-      ctx.strokeStyle = "rgba(229,231,235,0.14)";
+      ctx.strokeStyle = "rgba(229,231,235,0.16)";
       ctx.lineWidth = 1;
       for (let i = 0; i <= 5; i++) {
         const y = (h - 30) * (i / 5) + 10;
         ctx.beginPath();
-        ctx.moveTo(40, y);
+        ctx.moveTo(42, y);
         ctx.lineTo(w - 16, y);
         ctx.stroke();
       }
 
-      if (history.length < 2) {
+      const pointsData = measurements.slice(-MAX_POINTS);
+      if (pointsData.length < 2) {
         ctx.fillStyle = "rgba(229,231,235,0.7)";
-        ctx.font = "15px Cairo, sans-serif";
-        ctx.fillText("بانتظار البيانات...", 42, h / 2);
+        ctx.font = "14px Cairo, sans-serif";
+        ctx.fillText("أضف قياسات لعرض الرسم البياني...", 46, h / 2);
         return;
       }
 
-      const values = history.map(item => item.weight);
+      const values = pointsData.map((m) => Number(m.weight));
       const min = Math.min(...values) - 0.4;
       const max = Math.max(...values) + 0.4;
       const range = max - min || 1;
 
-      const points = history.map((item, index) => {
-        const x = 40 + index * ((w - 60) / (maxPoints - 1));
-        const y = 10 + ((max - item.weight) / range) * (h - 40);
-        return { x, y, value: item.weight };
+      const points = pointsData.map((item, i) => {
+        const x = 42 + i * ((w - 60) / (pointsData.length - 1));
+        const y = 10 + ((max - Number(item.weight)) / range) * (h - 40);
+        return { x, y, value: Number(item.weight) };
       });
 
-      // Area fill
       const gradient = ctx.createLinearGradient(0, 10, 0, h);
-      gradient.addColorStop(0, "rgba(34,197,94,0.35)");
+      gradient.addColorStop(0, "rgba(34,197,94,0.36)");
       gradient.addColorStop(1, "rgba(34,197,94,0.02)");
+
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.moveTo(points[0].x, h - 20);
-      points.forEach(p => ctx.lineTo(p.x, p.y));
+      points.forEach((p) => ctx.lineTo(p.x, p.y));
       ctx.lineTo(points[points.length - 1].x, h - 20);
       ctx.closePath();
       ctx.fill();
 
-      // Line
       ctx.strokeStyle = "#22c55e";
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2.6;
       ctx.beginPath();
-      points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+      points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
       ctx.stroke();
 
-      // Points
-      points.forEach(p => {
+      points.forEach((p) => {
         ctx.fillStyle = "#38bdf8";
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 3.6, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 3.7, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Labels
       ctx.fillStyle = "rgba(229,231,235,0.8)";
       ctx.font = "12px Cairo, sans-serif";
       ctx.fillText(max.toFixed(1) + " كجم", 4, 18);
       ctx.fillText(min.toFixed(1) + " كجم", 4, h - 20);
     }
 
-    function pushWeight(value) {
-      history.push({ weight: value, time: Date.now() });
-      if (history.length > maxPoints) history.shift();
-      currentWeightEl.textContent = value.toFixed(2);
+    function updateCurrentWeight() {
+      if (!measurements.length) {
+        currentWeightEl.textContent = "--";
+        return;
+      }
+      currentWeightEl.textContent = Number(measurements[measurements.length - 1].weight).toFixed(2);
+    }
+
+    function addMeasurement(weight, time = new Date().toISOString()) {
+      const value = Number(weight);
+      if (!Number.isFinite(value) || value <= 0) return;
+
+      measurements.push({ weight: value, time });
+      if (measurements.length > 1000) {
+        measurements = measurements.slice(-1000);
+      }
+
+      saveMeasurements();
+      updateCurrentWeight();
+      renderTable();
       drawChart();
     }
 
-    // Simulated data in case ESP32 isn't available
     function startDemoStream() {
-      let base = 68 + Math.random() * 3;
-      setInterval(() => {
-        base += (Math.random() - 0.5) * 0.35;
-        pushWeight(Math.max(40, Math.min(150, base)));
-      }, 1500);
+      if (demoTimer) return;
+      let base = measurements.length ? Number(measurements[measurements.length - 1].weight) : 68 + Math.random() * 2;
+      demoTimer = setInterval(() => {
+        base += (Math.random() - 0.5) * 0.4;
+        addMeasurement(Math.max(40, Math.min(150, base)));
+      }, 2000);
     }
 
     async function connectESP32() {
       if (!("serial" in navigator)) {
-        connectionStatus.textContent = "Web Serial غير مدعوم، جاري استخدام البيانات التجريبية.";
-        connectionStatus.style.color = "#fbbf24";
+        connectionStatus.textContent = "Web Serial غير مدعوم، تم تفعيل وضع المحاكاة.";
+        connectionStatus.style.color = "var(--warning)";
         startDemoStream();
         connectBtn.disabled = true;
-        connectBtn.textContent = "وضع المحاكاة مفعل";
+        connectBtn.textContent = "المحاكاة مفعلة";
         return;
       }
 
       try {
         const port = await navigator.serial.requestPort();
         await port.open({ baudRate: 115200 });
+
         connectionStatus.textContent = "✅ تم الاتصال بـ ESP32";
         connectionStatus.style.color = "#4ade80";
         connectBtn.disabled = true;
@@ -295,22 +480,49 @@
           const { value, done } = await reader.read();
           if (done) break;
           buffer += value;
+
           const lines = buffer.split("\n");
           buffer = lines.pop();
 
           for (const line of lines) {
             const num = parseFloat(line.trim());
-            if (!Number.isNaN(num)) pushWeight(num);
+            if (!Number.isNaN(num)) {
+              addMeasurement(num);
+            }
           }
         }
-      } catch (err) {
-        connectionStatus.textContent = "فشل الاتصال، تم التبديل للوضع التجريبي.";
+      } catch {
+        connectionStatus.textContent = "فشل الاتصال، تم التبديل للمحاكاة.";
         connectionStatus.style.color = "#f87171";
         startDemoStream();
       }
     }
 
+    addWeightBtn.addEventListener("click", () => {
+      addMeasurement(manualWeightInput.value);
+      manualWeightInput.value = "";
+      manualWeightInput.focus();
+    });
+
+    manualWeightInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        addWeightBtn.click();
+      }
+    });
+
+    clearBtn.addEventListener("click", () => {
+      if (!confirm("هل تريد حذف كل القياسات المحفوظة؟")) return;
+      measurements = [];
+      saveMeasurements();
+      updateCurrentWeight();
+      renderTable();
+      drawChart();
+    });
+
     connectBtn.addEventListener("click", connectESP32);
+
+    updateCurrentWeight();
+    renderTable();
     drawChart();
   </script>
 </body>
